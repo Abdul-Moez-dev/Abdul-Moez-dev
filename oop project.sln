@@ -1,0 +1,431 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <string>
+#include <sstream>
+using namespace std;
+class addCategorycl {
+private:
+	vector<string> categoryTitle;
+public:
+	addCategorycl() {}
+	void addC(const string& add) {
+		categoryTitle.push_back(add);
+		
+	}
+	void writeCategory() {
+		ofstream catFile("CategoryFile.txt",ios::app);
+		if (catFile.is_open()) {
+			for (auto add : categoryTitle) {
+				catFile << add<<endl;
+			}
+			catFile.close();
+		}
+		catFile.close();
+	}
+	void displayCategory() {
+		ifstream catFile("CategoryFile.txt");
+		if (catFile.is_open()) {
+			string add;
+			while (catFile >> add) {
+				categoryTitle.push_back(add);
+			}
+		}
+		catFile.close();
+		cout << "the categories are: " << endl;
+		for (auto cat : categoryTitle) {
+			cout << cat << endl;
+		}
+	}
+		string getcategory(int index) {
+			ifstream catFile("CategoryFile.txt");
+			if (catFile.is_open()) {
+				string add;
+				while (catFile >> add) {
+					categoryTitle.push_back(add);
+				}
+			}
+			catFile.close();
+			if (index >= 0 && index < categoryTitle.size()) {
+				return categoryTitle[index];
+			}
+			else {
+				cout << "Index out of bounds!" << endl;
+			}
+		}
+};
+class addProduct {
+private: 
+	vector<vector <string>> ProductData,newProductData;
+	string productTitle, availability;
+	string productPrice;
+	string productInventory;
+	string productCategory;
+public:
+	void newProduct(const string producttitle,const float productprice,const int productinventory,const string availability, const string productcategory) {
+		ProductData.push_back({ producttitle + "," + productcategory + "," + to_string(productprice) + "," + to_string(productinventory) + "," + availability});
+	}
+	
+	void inputProduct() {
+		ofstream productFile("Products.txt", ios::app);
+		if (productFile.is_open()) {
+			for (size_t i = 0; i < ProductData.size(); ++i) {
+				for (size_t j = 0; j < ProductData[i].size(); ++j) {
+					productFile << ProductData[i][j] << " ";
+					
+				}
+				productFile << endl;
+			}
+			productFile.close();
+		}
+	}
+	void readProducts() {
+		ProductData.clear();
+		ifstream productFile("Products.txt");
+		string line;
+		if (productFile.is_open()) {	
+			while (getline(productFile, line)) {
+				stringstream linedetect(line);
+				string cell;
+				vector<string> row;
+				while (getline(linedetect, cell, ',')) {
+					row.push_back(cell);
+				}
+				ProductData.push_back(row);
+			}
+			productFile.close();
+			
+		}
+	}
+	void displayProducts() {
+		readProducts();
+		int i = 0;
+		for (size_t i = 0; i < ProductData.size(); ++i) {
+			cout << i << ": ";
+			for (size_t j = 0; j < ProductData[i].size(); ++j) {
+				cout << ProductData[i][j] << " ";
+			}
+			cout << endl;
+		}
+	}
+	/*void findProduct(int select) {
+		ProductData.erase(ProductData.begin(), ProductData.end());
+		ifstream productFile("Products.txt");
+		if (productFile.is_open()) {
+			cout << "complete 8" << endl;
+			productFile >> ProductData[select - 1];
+			cout << "complete 9" << endl;
+			productFile.close();
+		}
+		
+	}*/
+	void updateProductTitle(const string& newProductTitle, int index) {
+		cout << "complete 5" << endl;
+		readProducts();
+		productTitle = newProductTitle;
+		productCategory = ProductData[index - 1][1];
+		productPrice = ProductData[index - 1][2];
+		productInventory = ProductData[index - 1][3];
+		availability = ProductData[index - 1][4];
+		cout << "complete 6" << endl;
+	}
+	void updateproductPrice(const float newproductPrice, int index) {
+		cout << "complete 5" << endl;
+		readProducts();
+		productPrice = to_string(newproductPrice);
+	}
+	void updateproductInventory(const int& newproductInventory, int index) {
+		readProducts();
+		productInventory = to_string(newproductInventory);
+	}
+	void updateavailability(const string& newavailability, int index) {
+		readProducts();
+		availability = newavailability;
+	}
+	void updateProduct(int index) {
+		readProducts();
+		newProductData.clear();
+		cout << "complete 7" << endl;
+		newProductData.push_back({ productTitle + ","+ productCategory + "," + productPrice + "," + productInventory + "," + availability});
+		ProductData[index-1].swap(newProductData[0]);
+		cout << "complete 8" << endl;
+		ofstream productFile("Products.txt", ios::trunc);
+		if (productFile.is_open()) {
+			for (size_t i = 0; i < ProductData.size(); ++i) {
+				for (size_t j = 0; j < ProductData[i].size(); ++j) {
+					productFile << ProductData[i][j] << " ";
+
+				}
+				productFile << endl;
+			}
+			productFile.close();
+		}
+		cout << "update done";
+		
+	}
+};
+void adminWrite(const vector<string> adminUsername,const vector<string> adminPassword) {
+	ofstream adminAcc("admin-Accounts.txt", ios::app);
+	if (adminAcc.is_open()) {
+		for (auto i = 0; i < adminPassword.size(); i++) {
+			adminAcc << adminUsername[i] << " " << adminPassword[i];
+		}
+		adminAcc.close();
+	}
+	else {
+		cout << "Error opening the file"<<endl;
+	}
+}
+bool adminread(const string& adminUsername,const string& adminPassword) {
+	ifstream adminAcc("admin-Accounts.txt");
+	if (adminAcc.is_open()) {
+		string acc1, acc2;
+		vector<string> check1, check2;
+		while (adminAcc >> acc1 >> acc2) {
+			check1.push_back(acc1);
+			check2.push_back(acc2);
+		}
+		for (auto i = 0; i < check2.size();i++) {
+			if (check1[i] == adminUsername && check2[i] == adminPassword) {
+				return true;
+			}
+		}
+		adminAcc.close();
+	}
+	else {
+		cout << "Error opening the file" << endl;
+	}
+	return false;
+}
+
+class Cafe {
+private:
+	
+protected:
+	vector<string> adminUsername,adminPassword;
+	
+public: 
+	//campusBites(string u, string p) : adminUsername(u), adminPassword(p){}
+	//campusBites(string u, string p) : adminUsername("nothing"), adminPassword("nothing"){}
+
+	void adminCreate() {
+		string adminUsername1, adminPassword2;
+		cin >> adminUsername1;
+		cin >> adminPassword2;
+		adminUsername.push_back(adminUsername1);
+		adminPassword.push_back(adminPassword2);
+		adminWrite(adminUsername, adminPassword);
+	}
+	bool adminlogin() {
+		string adminUsername1, adminPassword2;
+		cout << "Enter username";
+		cin >> adminUsername1;
+		cout << "Enter password";
+		cin >> adminPassword2;
+		adminUsername.push_back(adminUsername1);
+		adminPassword.push_back(adminPassword2);
+		if (adminread(adminUsername1, adminPassword2)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	void addCategoryfunc() {
+		string add;
+		string check;
+		addCategorycl ca;
+		cout << "do you want to add categories: ";
+		cin >> check;
+		while (check=="yes") {
+			cout << "Category Title: ";
+			cin >> add;
+			ca.addC(add);
+			cout << "Do you want to add another category: ";
+			cin >> check;
+		}
+		ca.writeCategory();
+	}
+	void addProducts() {
+		string productTitle;
+		float productPrice;
+		int productInventory, productCategoryindex,choose;
+		string availability, productCategory;
+		addProduct ap;
+		addCategorycl ca;
+		int check;
+		prodmenu:
+		cout << "1. Add Product\n2. Display All Product";
+		cin >> check;
+		if (check == 1) {
+			addprod:
+			cout << "Enter Product Title: ";
+			cin.ignore();
+			getline(cin, productTitle);
+			wapisAo:
+			cout << "Categories: " << endl;
+			ca.displayCategory();
+			cout << "Enter Product category number or Enter 0 for opening a new category portal: ";
+			cin >> productCategoryindex;
+			if (productCategoryindex == 0) {
+				addCategoryfunc();
+			}
+			else {
+				int productCategoryindexdec = productCategoryindex - 1;
+				productCategory = ca.getcategory(productCategoryindexdec);
+			}
+			cout << "Enter Product Price: ";
+			cin >> productPrice;
+			cout << "Enter Product Inventory: ";
+			cin >> productInventory;
+			cout << "Enter Product Availability: ";
+			cin >> availability;
+			ap.newProduct(productTitle, productPrice, productInventory, availability, productCategory);
+			ap.inputProduct();
+			cout << "Do you want to add another product: ";
+			cin >> check;
+			if (check == 1) {
+				goto addprod;
+			}
+		}
+		else if (check == 2) {
+			ap.displayProducts();
+		}
+		else if (check == 3) {
+			modifyProducts();
+		}
+		else {
+			cout << "Enter valid option";
+			goto prodmenu;
+		}
+	}
+	void modifyProducts() {
+		addProduct ap;
+		string newProductTitle;
+		float newProductPrice;
+		int newProductInventory;
+		string newAvailability;
+		ap.displayProducts();
+		int select,select2;
+		cout << "Select the product Which you want to modify: ";
+		cin >> select;
+		cout << "1.productTitle\n2. Category\n3. product price\n4.product inventory\n5. availability"<<endl;
+		cin >> select2;
+		switch (select2) {
+		case 1:
+			cout << "Enter new Product Title: ";
+			cin.ignore();
+			getline(cin, newProductTitle);
+			cout << "complete 1" << endl;
+			ap.updateProductTitle(newProductTitle, select);
+			cout << "complete 2" << endl;
+			ap.updateProduct(select);
+			cout << "complete 3" << endl;
+			break;
+
+		case 2:
+			cout << "Enter Product Price: ";
+			cin >> newProductPrice;
+			cout << "complete 1" << endl;
+			ap.updateproductPrice(newProductPrice, select);
+			cout << "complete 3" << endl;
+			ap.updateProduct(select);
+			cout << "complete 4" << endl;
+			break;
+		case 3:
+			cout << "Enter Product Inventory: ";
+			cin >> newProductInventory;
+			ap.updateproductInventory(newProductInventory, select);
+			ap.updateProduct(select);
+			break;
+		case 4:
+			cout << "Enter Product Availability: ";
+			cin >> newAvailability;
+			ap.updateavailability(newAvailability, select);
+			ap.updateProduct(select);
+			break;
+		default:
+			break;
+		}
+	}
+	void salesReport() {
+
+	}
+
+};
+class adminMenu : public Cafe {
+
+public: 
+	adminMenu() {
+		int choose;
+		while (true) {
+			cout << "1. Add Category" << endl;
+			cout << "2. Add Products" << endl;
+			cout << "3. Modify Existing Product" << endl;
+			cout << "4. Generate Sales Report" << endl;
+			cout << "5. exit" << endl;
+			while (true) {
+				cout << "Select the option to proceed" << endl;
+				cin >> choose;
+				switch (choose) {
+				case 1:
+					addCategoryfunc();
+					break;
+				case 2:
+					addProducts();
+					break;
+				case 3:
+					modifyProducts();
+					break;
+				case 4:
+					salesReport();
+					break;
+				case 5:
+					break;
+				default:
+					cout << "incorrect option. Choose again: ";
+					cin >> choose;
+					continue;
+				}
+				break;
+			}
+			if (choose ==5) {
+				break;
+			}
+			else {
+				continue;
+			}
+		}
+	}
+};
+void startup() {
+	/*addProduct ap;
+	ap.newProduct("product 1", 59.99, 10, "available", "category 1");
+	ap.inputProduct();
+	ap.displayProducts();*/
+	int choose;
+	Cafe cf;
+	bool check;
+	cout << "1.login\n2. create account";
+	cin >> choose;
+	switch (choose) {
+	case 1:
+		check = cf.adminlogin();
+		if (check) {
+			adminMenu am;
+		}
+		
+	case 2:
+		cf.adminCreate();
+	}
+}
+
+int main() {
+	/*addProduct ap;
+	ap.newProduct("Product1", 59.99, 5, "active");
+	ap.newProduct("Product2", 59.99, 5, "active");
+	ap.inputProduct();
+	Cafe c;
+	c.modifyProducts();*/
+	startup();
+}
